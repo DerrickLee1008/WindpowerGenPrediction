@@ -5,13 +5,9 @@ import numpy as np
 import pandas as pd
 
 def set_seed(seed: int = 42):
-    """
-    Set seeds for numpy / python / torch / tf to improve reproducibility.
-    """
-    import importlib
+    """Set seeds for numpy / python / torch / tf to improve reproducibility."""
     random.seed(seed)
     np.random.seed(seed)
-    # torch
     try:
         import torch
         torch.manual_seed(seed)
@@ -20,7 +16,6 @@ def set_seed(seed: int = 42):
         torch.backends.cudnn.benchmark = False
     except Exception:
         pass
-    # tensorflow
     try:
         import tensorflow as tf
         tf.random.set_seed(seed)

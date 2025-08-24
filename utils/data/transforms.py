@@ -12,17 +12,14 @@ def add_basic_time_features(df: pd.DataFrame, time_col='Date/Time') -> pd.DataFr
     return df
 
 def add_diff_features(df: pd.DataFrame, cols: List[str], group_cols: List[str] = None, suffix='_diff'):
-    """
-    Add first differences for selected columns. If group_cols is given, compute diffs per group to
-    avoid crossing day/WTG boundaries.
-    """
+    """Add first differences for selected columns. If group_cols is given, compute diffs per group."""
     d = df.copy()
     if group_cols is None:
         for c in cols:
             if c in d.columns:
                 d[c + suffix] = d[c].diff()
     else:
-        order_cols = group_cols + ['Date/Time'] if 'Date/Time' in d.columns else group_cols
+        order_cols = group_cols + (['Date/Time'] if 'Date/Time' in d.columns else [])
         d = d.sort_values(order_cols)
         for c in cols:
             if c in d.columns:
@@ -39,14 +36,10 @@ def wind_speed_binning(df: pd.DataFrame, col='vws_10m'):
     return pd.concat([df, dummies], axis=1)
 
 def make_stage2_features(df: pd.DataFrame):
-    """
-    Stage-2 uses forecast features + Stage-1 predicted (pseudo-observed) nacelle signals.
-    Raw SCADA should NOT be used at inference time.
-    """
+    """Stage-2 uses forecast features + Stage-1 predicted (pseudo-observed) nacelle signals."""
     feature_cols = [
         'vws_10m','uws_10m','ta','rh_1p5m','pmsl','dswrf',
         'hour','day_of_week',
-        # Stage-1 pseudo-observed outputs (must exist before this call)
         'pred_Nacelle_Wind_Speed', 'pred_Nacelle_Wind_Direction', 'pred_Nacelle_Outdoor_Temp'
     ]
     exist = [c for c in feature_cols if c in df.columns]
